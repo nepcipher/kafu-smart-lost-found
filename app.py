@@ -110,7 +110,34 @@ textarea { min-height: 100px; resize: vertical; }
     margin-bottom: 20px;
 }
 .muted { color: #687589; font-size: 14px; }
-footer { text-align: center; padding: 25px; color: #687589; }
+
+.site-footer {
+    text-align: center;
+    padding: 35px 7%;
+    margin-top: 40px;
+    background: #102b50;
+    color: #ffffff;
+}
+.site-footer h3 { margin-bottom: 8px; }
+.site-footer p { line-height: 1.6; }
+.developer-card {
+    max-width: 480px;
+    margin: 24px auto;
+    padding: 22px;
+    background: #ffffff;
+    color: #18253a;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px #00000020;
+}
+.developer-card h4 { margin-top: 0; color: #1769aa; }
+.developer-card a {
+    color: #1769aa;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+.developer-card a:hover { text-decoration: underline; }
+.site-footer .muted { color: #dceaff; }
+
 </style>
 </head>
 <body>
@@ -254,7 +281,31 @@ footer { text-align: center; padding: 25px; color: #687589; }
 </main>
 {% endif %}
 
-<footer>KAFU Smart Lost & Found · Student innovation project</footer>
+
+<footer class="site-footer">
+    <h3>KAFU Smart Lost &amp; Found</h3>
+    <p>Find It. Report It. Return It.</p>
+    <p>A student innovation project helping the KAFU community reconnect with lost belongings.</p>
+
+    <div class="developer-card">
+        <h4>About the Developer</h4>
+        <p><strong>Nepstar Sunguti</strong></p>
+        <p>KAFU Computer Science Student</p>
+        <p>
+            <a href="https://wa.me/254143467188" target="_blank" rel="noopener noreferrer">
+                Chat with me on WhatsApp
+            </a>
+        </p>
+        <p>
+            <a href="mailto:nepstarsunguti@gmail.com">
+                nepstarsunguti@gmail.com
+            </a>
+        </p>
+    </div>
+
+    <p class="muted">Developed by a KAFU Computer Science student.</p>
+</footer>
+
 </body>
 </html>
 """
