@@ -307,6 +307,19 @@ textarea { min-height: 100px; resize: vertical; }
     <p class="muted">Developed by a KAFU Computer Science student.</p>
 </footer>
 
+<section style="text-align:center; padding:24px; margin:20px auto; max-width:500px; background:#f0f5fb; border-radius:16px;">
+  <h2 style="color:#102b50;">📱 Access Our Portal Easily</h2>
+  <p>Scan this QR code with your phone to open KAFU Smart Lost &amp; Found.</p>
+  <img
+    src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&amp;data=https%3A%2F%2Fkafu-smart-lost-found.onrender.com%2F"
+    alt="QR code for KAFU Smart Lost and Found"
+    width="220"
+    height="220"
+    style="background:white; padding:10px; border-radius:8px;"
+  >
+  <p style="color:#334155;">Help reunite students with their lost items.</p>
+</section>
+
 </body>
 </html>
 """
