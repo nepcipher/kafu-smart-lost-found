@@ -34,6 +34,7 @@ PAGE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="google-site-verification" content="bkCUQSTiB8DatPcPl5lhA9-ty8GQPpWxI06iM1ns5hk" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#102b50">
