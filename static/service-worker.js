@@ -1,9 +1,12 @@
-const CACHE_NAME = "kafu-lost-found-v1";
-const OFFLINE_URL = "/offline.html";
+
+
+const CACHE_NAME = "kafu-lost-found-v3";
+const OFFLINE_URL = "/static/offline.html";
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.add(OFFLINE_URL))
+    caches.open(CACHE_NAME)
+      .then(cache => cache.add(OFFLINE_URL))
   );
   self.skipWaiting();
 });
@@ -12,7 +15,12 @@ self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+        keys
+          .filter(key =>
+            key.startsWith("kafu-lost-found-") &&
+            key !== CACHE_NAME
+          )
+          .map(key => caches.delete(key))
       )
     )
   );
@@ -27,9 +35,14 @@ self.addEventListener("fetch", event => {
 
   if (event.request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request).catch(() =>
-        caches.match(OFFLINE_URL)
-      )
+      fetch(event.request)
+        .then(response => response)
+        .catch(async () => {
+          const cachedPage = await caches.match(event.request);
+          if (cachedPage) return cachedPage;
+
+          return caches.match(OFFLINE_URL);
+        })
     );
   }
 });

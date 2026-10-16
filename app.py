@@ -140,8 +140,103 @@ textarea { min-height: 100px; resize: vertical; }
 .site-footer .muted { color: #dceaff; }
 
 </style>
+
+<style>
+/* Campus FindIt dashboard menu */
+.menu-button {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1002;
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 10px;
+    background: #102b50;
+    color: white;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.dashboard-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    display: none;
+}
+
+.dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: -290px;
+    width: 270px;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 80px 15px 20px;
+    background: #102b50;
+    color: white;
+    z-index: 1001;
+    transition: left 0.25s ease;
+    overflow-y: auto;
+}
+
+.dashboard-sidebar.open {
+    left: 0;
+}
+
+.dashboard-overlay.open {
+    display: block;
+}
+
+.dashboard-sidebar a {
+    display: block;
+    padding: 14px 12px;
+    margin-bottom: 6px;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.dashboard-sidebar a:hover {
+    background: #1f4e79;
+}
+
+.dashboard-sidebar h2 {
+    margin: 0 0 20px;
+    font-size: 22px;
+}
+
+@media (min-width: 768px) {
+    .menu-button {
+        top: 20px;
+        left: 20px;
+    }
+}
+</style>
+</head>
 </head>
 <body>
+
+<button class="menu-button" id="menuButton"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        onclick="toggleDashboard()">☰</button>
+
+<div class="dashboard-overlay" id="dashboardOverlay"
+     onclick="toggleDashboard()"></div>
+
+<nav class="dashboard-sidebar" id="dashboardSidebar">
+    <h2>Campus FindIt</h2>
+
+    <a href="/">🏠 Dashboard</a>
+    <a href="/claims">📋 Claims</a>
+    <a href="/search">🔎 Browse Items</a>
+    <a href="/report/lost">📢 Report Lost Items</a>
+    <a href="/report/found">📦 Report Found Items</a>
+    <a href="/notifications">🔔 Notifications</a>
+</nav>
+
 <header>
     <h1><a href="/">KAFU Smart Lost & Found</a></h1>
     <div>Find It. Report It. Return It.</div>
@@ -280,10 +375,93 @@ textarea { min-height: 100px; resize: vertical; }
         </section>
     {% endif %}
 </main>
+
+{% elif page == 'claims' %}
+<main>
+    <h2>📋 Claims & Item Returns</h2>
+    <p>Review reported items and their current status.</p>
+
+    {% if reports %}
+        <div class="grid">
+        {% for item in reports %}
+            <article class="card">
+                <h3>{{ item['item_name'] }}</h3>
+                <p><strong>Report type:</strong> {{ item['report_type']|title }}</p>
+                <p><strong>Category:</strong> {{ item['category'] }}</p>
+                <p><strong>Location:</strong> {{ item['location'] }}</p>
+                <p><strong>Status:</strong> {{ item['status']|title }}</p>
+                <p class="muted">Report #{{ item['id'] }}</p>
+
+                {% if item['status'] != 'recovered' %}
+                    <form method="POST"
+                          action="{{ url_for('recover', report_id=item['id']) }}">
+                        <button class="btn" type="submit">
+                            Mark as Recovered
+                        </button>
+                    </form>
+                {% else %}
+                    <p><strong>Item returned!</strong></p>
+                {% endif %}
+            </article>
+        {% endfor %}
+        </div>
+    {% else %}
+        <section class="card">
+            <p>No reports have been submitted yet.</p>
+        </section>
+    {% endif %}
+</main>
+
+{% elif page == 'notifications' %}
+<main>
+    <h2>🔔 Notifications</h2>
+    <p>Stay updated on activity in the KAFU Lost & Found portal.</p>
+
+    <section class="card">
+        <h3>📢 Lost and Found Reports</h3>
+        <p>Visit Browse Items to see recently reported belongings.</p>
+        <a class="btn" href="/search">Browse Items</a>
+    </section>
+
+    <section class="card">
+        <h3>🤝 Item Returns</h3>
+        <p>Check whether an item has been marked as recovered.</p>
+        <a class="btn" href="/claims">View Claims & Returns</a>
+    </section>
+
+    <section class="card">
+    <h3>🕒 Recent Activity</h3>
+
+    {% if reports %}
+        {% for item in reports %}
+            <article class="card">
+                <h4>
+                    {% if item['status'] == 'recovered' %}
+                        ✅ Item Recovered
+                    {% elif item['report_type'] == 'lost' %}
+                        🔍 Lost Item Reported
+                    {% else %}
+                        📦 Found Item Reported
+                    {% endif %}
+                </h4>
+
+                <p><strong>Item:</strong> {{ item['item_name'] }}</p>
+                <p><strong>Location:</strong> {{ item['location'] }}</p>
+                <p><strong>Status:</strong> {{ item['status']|title }}</p>
+                <p><strong>Submitted:</strong> {{ item['created_at'] }}</p>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p>No activity yet. New lost and found reports will appear here.</p>
+    {% endif %}
+</section>
+</main>
+
 {% endif %}
 
 
 <footer class="site-footer">
+
     <h3>KAFU Smart Lost &amp; Found</h3>
     <p>Find It. Report It. Return It.</p>
     <p>A student innovation project helping the KAFU community reconnect with lost belongings.</p>
@@ -320,6 +498,42 @@ textarea { min-height: 100px; resize: vertical; }
   <p style="color:#334155;">Help reunite students with their lost items.</p>
 </section>
 
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js")
+      .catch(error => console.error("Service worker registration failed:", error));
+  });
+}
+</script>
+
+<script>
+function toggleDashboard() {
+    const sidebar = document.getElementById("dashboardSidebar");
+    const overlay = document.getElementById("dashboardOverlay");
+    const button = document.getElementById("menuButton");
+
+    const isOpen = sidebar.classList.toggle("open");
+    overlay.classList.toggle("open", isOpen);
+    button.setAttribute("aria-expanded", isOpen);
+    button.setAttribute(
+        "aria-label",
+        isOpen ? "Close navigation menu" : "Open navigation menu"
+    );
+}
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        const sidebar = document.getElementById("dashboardSidebar");
+        if (sidebar && sidebar.classList.contains("open")) {
+            toggleDashboard();
+        }
+    }
+});
+</script>
+</body>
+
 </body>
 </html>
 """
@@ -327,6 +541,12 @@ textarea { min-height: 100px; resize: vertical; }
 
 def render_page(page, **context):
     return render_template_string(PAGE, page=page, **context)
+
+
+
+@app.route("/service-worker.js")
+def service_worker():
+    return app.send_static_file("service-worker.js")
 
 
 @app.route("/")
@@ -405,6 +625,39 @@ def search():
         query=query,
         message="Your report was saved successfully." if saved else None
     )
+
+@app.route("/claims")
+def claims():
+    with get_db() as db:
+        reports = db.execute("""
+            SELECT * FROM reports
+            ORDER BY created_at DESC
+        """).fetchall()
+
+    return render_page(
+        "claims",
+        reports=reports,
+        query="",
+        message=None
+    )
+
+@app.route("/notifications")
+def notifications():
+    with get_db() as db:
+        reports = db.execute("""
+            SELECT *
+            FROM reports
+            ORDER BY created_at DESC
+            LIMIT 50
+        """).fetchall()
+
+    return render_page(
+        "notifications",
+        message=None,
+        reports=reports
+    )
+
+
 
 
 initialize_database()
