@@ -548,7 +548,28 @@ def render_page(page, **context):
 def service_worker():
     return app.send_static_file("service-worker.js")
 
+@app.route("/sitemap.xml")
+def sitemap():
+    from flask import Response
 
+    base_url = "https://kafu-smart-lost-found.onrender.com"
+
+    urls = [
+        "/",
+        "/search",
+        "/claims",
+        "/notifications",
+    ]
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+
+    for path in urls:
+        xml += f"<url><loc>{base_url}{path}</loc></url>"
+
+    xml += "</urlset>"
+
+    return Response(xml, mimetype="application/xml")
 @app.route("/")
 def home():
     return render_page("home", message=None)
